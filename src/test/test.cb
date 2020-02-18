@@ -1,0 +1,7 @@
+import stddef;
+
+int
+main(int argc, char **argv)
+{
+    size_t a = 1;
+}
