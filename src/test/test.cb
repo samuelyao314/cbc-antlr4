@@ -1,7 +1,8 @@
-import stddef;
+import stdio;
 
-int
-main(int argc, char **argv)
+int main(void)
 {
-    size_t a = 1;
+    {
+        size_t i = 0;
+    }
 }

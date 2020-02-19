@@ -1,8 +1,8 @@
 package net.loveruby.cflat.compiler;
 //import net.loveruby.cflat.parser.LibraryLoader;
-//import net.loveruby.cflat.type.TypeTable;
+import net.loveruby.cflat.type.TypeTable;
 //import net.loveruby.cflat.asm.*;
-//import net.loveruby.cflat.sysdep.*;
+import net.loveruby.cflat.sysdep.*;
 import net.loveruby.cflat.parser.LibraryLoader;
 import net.loveruby.cflat.utils.ErrorHandler;
 import net.loveruby.cflat.exception.*;
@@ -30,7 +30,7 @@ class Options {
     // private LinkerOptions ldOptions = new LinkerOptions();
     private LibraryLoader loader = new LibraryLoader();
     private CompilerMode mode;
-    // private Platform platform = new X86Linux();
+    private Platform platform = new X64Linux();
 
 
     CompilerMode mode() {
@@ -62,10 +62,11 @@ class Options {
     LibraryLoader loader() {
         return this.loader;
     }
-//
-//    TypeTable typeTable() {
-//        return platform.typeTable();
-//    }
+
+    TypeTable typeTable() {
+        return platform.typeTable();
+    }
+
 //
 //    CodeGenerator codeGenerator(ErrorHandler h) {
 //        return platform.codeGenerator(genOptions, h);

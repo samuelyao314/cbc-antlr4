@@ -1,8 +1,10 @@
 package net.loveruby.cflat.compiler;
 
 import net.loveruby.cflat.ast.ExprNode;
+import net.loveruby.cflat.ast.StmtNode;
 import net.loveruby.cflat.parser.gen.CbcParser;
 import net.loveruby.cflat.type.IntegerTypeRef;
+import net.loveruby.cflat.type.TypeTable;
 import org.antlr.v4.runtime.Token;
 
 import net.loveruby.cflat.exception.*;
@@ -114,8 +116,9 @@ public class Compiler {
         AST ast = parseFile(srcPath, opts);
         if (dumpAST(ast, opts.mode())) return;
 
-//        TypeTable types = opts.typeTable();
-//        AST sem = semanticAnalyze(ast, types, opts);
+        TypeTable types = opts.typeTable();
+        AST sem = semanticAnalyze(ast, types, opts);
+
 //        if (dumpSemant(sem, opts.mode())) return;
 //        IR ir = new IRGenerator(types, errorHandler).generate(sem);
 //        if (dumpIR(ir, opts.mode())) return;
@@ -136,15 +139,50 @@ public class Compiler {
             case DumpAST:
                 ast.dump();
                 return true;
-//            case DumpStmt:
-//                findStmt(ast).dump();
-//                return true;
-//            case DumpExpr:
-//                findExpr(ast).dump();
-//                return true;
+            case DumpStmt:
+                findStmt(ast).dump();
+                return true;
+            case DumpExpr:
+                findExpr(ast).dump();
+                return true;
             default:
                 return false;
         }
+    }
+
+    private StmtNode findStmt(AST ast) {
+        StmtNode stmt = ast.getSingleMainStmt();
+        if (stmt == null) {
+            errorExit("source file does not contains main()");
+        }
+        return stmt;
+    }
+
+    private ExprNode findExpr(AST ast) {
+        ExprNode expr = ast.getSingleMainExpr();
+        if (expr == null) {
+            errorExit("source file does not contains single expression");
+        }
+        return expr;
+    }
+
+    public AST semanticAnalyze(AST ast, TypeTable types,
+                               Options opts) throws SemanticException {
+        new LocalResolver(errorHandler).resolve(ast);
+//        new TypeResolver(types, errorHandler).resolve(ast);
+//        types.semanticCheck(errorHandler);
+//        if (opts.mode() == CompilerMode.DumpReference) {
+//            ast.dump();
+//            return ast;
+//        }
+//        new DereferenceChecker(types, errorHandler).check(ast);
+//        new TypeChecker(types, errorHandler).check(ast);
+        return ast;
+    }
+
+    private void errorExit(String msg) {
+        errorHandler.error(msg);
+        System.exit(1);
     }
 
 

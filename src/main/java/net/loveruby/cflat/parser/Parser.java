@@ -1,8 +1,5 @@
 package net.loveruby.cflat.parser;
 
-import com.sun.jdi.CharType;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import jdk.nashorn.internal.ir.TernaryNode;
 import net.loveruby.cflat.parser.gen.CbcParser.*;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -13,16 +10,13 @@ import org.antlr.v4.runtime.Token;
 import net.loveruby.cflat.ast.*;
 import net.loveruby.cflat.entity.*;
 import net.loveruby.cflat.type.*;
-import net.loveruby.cflat.asm.Label;
 import net.loveruby.cflat.utils.ErrorHandler;
 import net.loveruby.cflat.exception.*;
 import net.loveruby.cflat.parser.gen.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import sun.jvm.hotspot.debugger.cdbg.PointerType;
 import net.loveruby.cflat.entity.Parameter;
 
-import java.lang.reflect.*;
 import java.util.*;
 import java.io.*;
 
@@ -120,9 +114,8 @@ public class Parser extends CbcBaseVisitor<Object>  {
 
         //用 cpcs 构造词法分析器 lexer，词法分析的作用是产生记号
         CbcLexer lexer = new CbcLexer(cpcs);
-        ThrowingErrorListener listener = new ThrowingErrorListener(this);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(listener);
+        lexer.addErrorListener(new LexerErrorListener(this));
         this.lexer = lexer;
 
         //用词法分析器 lexer 构造一个记号流 tokens
@@ -131,7 +124,7 @@ public class Parser extends CbcBaseVisitor<Object>  {
         //再使用 tokens 构造语法分析器 parser,至此已经完成词法分析和语法分析的准备工作
         CbcParser p = new CbcParser(tokens);
         p.removeErrorListeners();
-        p.addErrorListener(listener);
+        p.addErrorListener(new ParserErrorListener(this));
         this.parser = p;
 
         if (debug) {
@@ -1172,6 +1165,7 @@ public class Parser extends CbcBaseVisitor<Object>  {
     public AST visitCompilation_unit(Compilation_unitContext ctx) {
         Declarations impdecls = (Declarations) visit(ctx.import_stmts());
         Declarations decls = (Declarations) visit(ctx.top_defs());
+        decls.add(impdecls);
         return new AST(location(ctx.start), decls);
     }
 
@@ -1182,34 +1176,32 @@ public class Parser extends CbcBaseVisitor<Object>  {
         Declarations decls = new Declarations();
         decls.add(impdecls);
 
-        for (ParseTree tree : ctx.funcdecl()) {
-            UndefinedFunction n  = (UndefinedFunction) visit(tree);
-            decls.addFuncdecl(n);
-        }
-        for (ParseTree tree : ctx.vardecl()) {
-            UndefinedVariable n  = (UndefinedVariable) visit(tree);
-            decls.addVardecl(n);
-        }
-
-        for (ParseTree tree : ctx.defconst()) {
-            Constant n  = (Constant) visit(tree);
-            decls.addConstant(n);
-        }
-
-        for (ParseTree tree : ctx.defstruct()) {
-            StructNode n  = (StructNode) visit(tree);
-            decls.addDefstruct(n);
-        }
-
-        for (ParseTree tree : ctx.defunion()) {
-            UnionNode n  = (UnionNode) visit(tree);
-            decls.addDefunion(n);
-        }
-
-
-        for (ParseTree tree : ctx.typedef()) {
-            TypedefNode n  = (TypedefNode) visit(tree);
-            decls.addTypedef(n);
+        for (int i = 1; i < ctx.children.size(); i++) {
+            ParseTree tree = ctx.getChild(i);
+            if (tree instanceof FuncdeclContext) {
+                UndefinedFunction n  = (UndefinedFunction) visit(tree);
+                decls.addFuncdecl(n);
+            }
+            if (tree instanceof VardeclContext) {
+                UndefinedVariable n  = (UndefinedVariable) visit(tree);
+                decls.addVardecl(n);
+            }
+            if (tree instanceof DefconstContext) {
+                Constant n  = (Constant) visit(tree);
+                decls.addConstant(n);
+            }
+            if (tree instanceof DefstructContext) {
+                StructNode n  = (StructNode) visit(tree);
+                decls.addDefstruct(n);
+            }
+            if (tree instanceof DefunionContext) {
+                UnionNode n  = (UnionNode) visit(tree);
+                decls.addDefunion(n);
+            }
+            if (tree instanceof TypedefContext) {
+                TypedefNode n  = (TypedefNode) visit(tree);
+                decls.addTypedef(n);
+            }
         }
 
         return  decls;
