@@ -2,7 +2,7 @@ package net.loveruby.cflat.entity;
 import net.loveruby.cflat.type.Type;
 import net.loveruby.cflat.ast.TypeNode;
 import net.loveruby.cflat.ast.BlockNode;
-//import net.loveruby.cflat.ir.Stmt;
+import net.loveruby.cflat.ir.Stmt;
 import net.loveruby.cflat.asm.Label;
 import net.loveruby.cflat.exception.*;
 import java.util.List;
@@ -11,7 +11,7 @@ public class DefinedFunction extends Function {
     protected Params params;
     protected BlockNode body;
     protected LocalScope scope;
-    //protected List<Stmt> ir;
+    protected List<Stmt> ir;
 
     public DefinedFunction(boolean priv, TypeNode type,
             String name, Params params, BlockNode body) {
@@ -32,13 +32,13 @@ public class DefinedFunction extends Function {
         return body;
     }
 
-//    public List<Stmt> ir() {
-//        return ir;
-//    }
-//
-//    public void setIR(List<Stmt> ir) {
-//        this.ir = ir;
-//    }
+    public List<Stmt> ir() {
+        return ir;
+    }
+
+    public void setIR(List<Stmt> ir) {
+        this.ir = ir;
+    }
 
     public void setScope(LocalScope scope) {
         this.scope = scope;

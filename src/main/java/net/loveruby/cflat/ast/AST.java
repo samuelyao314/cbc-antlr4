@@ -1,6 +1,6 @@
 package net.loveruby.cflat.ast;
 import net.loveruby.cflat.entity.*;
-//import net.loveruby.cflat.ir.IR;
+import net.loveruby.cflat.ir.IR;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.PrintStream;
@@ -96,14 +96,14 @@ public class AST extends Node {
         return constantTable;
     }
 
-//    public IR ir() {
-//        return new IR(source,
-//                declarations.defvars(),
-//                declarations.defuns(),
-//                declarations.funcdecls(),
-//                scope,
-//                constantTable);
-//    }
+    public IR ir() {
+        return new IR(source,
+                declarations.defvars(),
+                declarations.defuns(),
+                declarations.funcdecls(),
+                scope,
+                constantTable);
+    }
 
     protected void _dump(Dumper d) {
         d.printNodeList("variables", definedVariables());

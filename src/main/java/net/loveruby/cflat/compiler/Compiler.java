@@ -2,6 +2,7 @@ package net.loveruby.cflat.compiler;
 
 import net.loveruby.cflat.ast.ExprNode;
 import net.loveruby.cflat.ast.StmtNode;
+import net.loveruby.cflat.ir.IR;
 import net.loveruby.cflat.parser.gen.CbcParser;
 import net.loveruby.cflat.type.IntegerTypeRef;
 import net.loveruby.cflat.type.TypeTable;
@@ -120,8 +121,8 @@ public class Compiler {
         AST sem = semanticAnalyze(ast, types, opts);
         if (dumpSemant(sem, opts.mode())) return;
 
-    //    IR ir = new IRGenerator(types, errorHandler).generate(sem);
-    //    if (dumpIR(ir, opts.mode())) return;
+        IR ir = new IRGenerator(types, errorHandler).generate(sem);
+        if (dumpIR(ir, opts.mode())) return;
 
 //        AssemblyCode asm = generateAssembly(ir, opts);
 //        if (dumpAsm(asm, opts.mode())) return;
@@ -198,5 +199,14 @@ public class Compiler {
         }
     }
 
+    private boolean dumpIR(IR ir, CompilerMode mode) {
+        if (mode == CompilerMode.DumpIR) {
+            ir.dump();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
 }

@@ -1,4 +1,10 @@
-int main(void)
+import stdio;
+
+int main(int argc, char** argv)
 {
-    ++1;
+   if (1) {
+        printf("xx");
+   } else {
+        printf("22");
+   }
 }
