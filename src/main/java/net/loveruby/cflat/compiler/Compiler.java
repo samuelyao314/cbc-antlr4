@@ -118,10 +118,11 @@ public class Compiler {
 
         TypeTable types = opts.typeTable();
         AST sem = semanticAnalyze(ast, types, opts);
+        if (dumpSemant(sem, opts.mode())) return;
 
-//        if (dumpSemant(sem, opts.mode())) return;
-//        IR ir = new IRGenerator(types, errorHandler).generate(sem);
-//        if (dumpIR(ir, opts.mode())) return;
+    //    IR ir = new IRGenerator(types, errorHandler).generate(sem);
+    //    if (dumpIR(ir, opts.mode())) return;
+
 //        AssemblyCode asm = generateAssembly(ir, opts);
 //        if (dumpAsm(asm, opts.mode())) return;
 //        if (printAsm(asm, opts.mode())) return;
@@ -169,20 +170,32 @@ public class Compiler {
     public AST semanticAnalyze(AST ast, TypeTable types,
                                Options opts) throws SemanticException {
         new LocalResolver(errorHandler).resolve(ast);
-//        new TypeResolver(types, errorHandler).resolve(ast);
-//        types.semanticCheck(errorHandler);
-//        if (opts.mode() == CompilerMode.DumpReference) {
-//            ast.dump();
-//            return ast;
-//        }
-//        new DereferenceChecker(types, errorHandler).check(ast);
-//        new TypeChecker(types, errorHandler).check(ast);
+        new TypeResolver(types, errorHandler).resolve(ast);
+        types.semanticCheck(errorHandler);
+        if (opts.mode() == CompilerMode.DumpReference) {
+            ast.dump();
+            return ast;
+        }
+       new DereferenceChecker(types, errorHandler).check(ast);
+       new TypeChecker(types, errorHandler).check(ast);
         return ast;
     }
 
     private void errorExit(String msg) {
         errorHandler.error(msg);
         System.exit(1);
+    }
+
+    private boolean dumpSemant(AST ast, CompilerMode mode) {
+        switch (mode) {
+            case DumpReference:
+                return true;
+            case DumpSemantic:
+                ast.dump();
+                return true;
+            default:
+                return false;
+        }
     }
 
 

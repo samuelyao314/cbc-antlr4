@@ -1,8 +1,4 @@
-import stdio;
-
 int main(void)
 {
-    {
-        size_t i = 0;
-    }
+    ++1;
 }

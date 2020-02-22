@@ -143,6 +143,9 @@ public class Parser extends CbcBaseVisitor<Object>  {
         }
         // 通过访问者模式，执行我们的程序
         AST ast = (AST) this.visit(tree);
+        if (parserErrmsg != null) {
+            throw new SyntaxException(parserErrmsg);
+        }
         return ast;
     }
 
@@ -866,7 +869,7 @@ public class Parser extends CbcBaseVisitor<Object>  {
         int idx = 2;
         do {
             String name = (String) visit(ctx.getChild(idx));
-            if (idx >=  tree_size) {
+            if (idx + 1 >=  tree_size) {
                 defs.add(new DefinedVariable(priv, type, name, null));
                 break;
             }
@@ -965,7 +968,7 @@ public class Parser extends CbcBaseVisitor<Object>  {
             }
         }
         if (t.getType() == CbcParser.STRUCT) {
-            String name = (String) visit(ctx.getChild(1));
+            String name = ctx.getChild(1).getText();
             node = new StructTypeRef(location(t), name);
         }
         if (t.getType() == CbcParser.UNION) {
@@ -977,8 +980,8 @@ public class Parser extends CbcBaseVisitor<Object>  {
             if (isType(name)) {
                 node = new UserTypeRef(location(t), t.getText());
             } else {
-                // todo
-                // 如果不是类型，应该怎么办?
+                // 如果不是类型
+                parserErrmsg = "invalid Typeref_base, token: " + t.getText();
             }
         }
         return node;
