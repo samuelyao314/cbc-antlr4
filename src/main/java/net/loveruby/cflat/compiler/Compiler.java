@@ -4,6 +4,7 @@ import net.loveruby.cflat.ast.ExprNode;
 import net.loveruby.cflat.ast.StmtNode;
 import net.loveruby.cflat.ir.IR;
 import net.loveruby.cflat.parser.gen.CbcParser;
+import net.loveruby.cflat.sysdep.AssemblyCode;
 import net.loveruby.cflat.type.IntegerTypeRef;
 import net.loveruby.cflat.type.TypeTable;
 import org.antlr.v4.runtime.Token;
@@ -124,10 +125,10 @@ public class Compiler {
         IR ir = new IRGenerator(types, errorHandler).generate(sem);
         if (dumpIR(ir, opts.mode())) return;
 
-//        AssemblyCode asm = generateAssembly(ir, opts);
-//        if (dumpAsm(asm, opts.mode())) return;
-//        if (printAsm(asm, opts.mode())) return;
-//        writeFile(destPath, asm.toSource());
+        AssemblyCode asm = generateAssembly(ir, opts);
+        if (dumpAsm(asm, opts.mode())) return;
+        if (printAsm(asm, opts.mode())) return;
+        writeFile(destPath, asm.toSource());
     }
 
     public AST parseFile(String path, Options opts)
@@ -209,4 +210,54 @@ public class Compiler {
         }
     }
 
+
+    public AssemblyCode generateAssembly(IR ir, Options opts) {
+        return opts.codeGenerator(errorHandler).generate(ir);
+    }
+
+    private boolean dumpAsm(AssemblyCode asm, CompilerMode mode) {
+        if (mode == CompilerMode.DumpAsm) {
+            asm.dump(System.out);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private boolean printAsm(AssemblyCode asm, CompilerMode mode) {
+        if (mode == CompilerMode.PrintAsm) {
+            System.out.print(asm.toSource());
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+    private void writeFile(String path, String str) throws FileException {
+        if (path.equals("-")) {
+            System.out.print(str);
+            return;
+        }
+        try {
+            BufferedWriter f = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(path)));
+            try {
+                f.write(str);
+            }
+            finally {
+                f.close();
+            }
+        }
+        catch (FileNotFoundException ex) {
+            errorHandler.error("file not found: " + path);
+            throw new FileException("file error");
+        }
+        catch (IOException ex) {
+            errorHandler.error("IO error" + ex.getMessage());
+            throw new FileException("file error");
+        }
+    }
 }

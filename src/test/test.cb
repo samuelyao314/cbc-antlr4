@@ -1,10 +1,12 @@
 import stdio;
 
+
 int main(int argc, char** argv)
 {
-   if (1) {
-        printf("xx");
-   } else {
-        printf("22");
-   }
+    int i = 2;
+    if (i > 1) {
+        i  += 3;
+    }
+
+    return 0;
 }

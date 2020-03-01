@@ -25,7 +25,7 @@ class Options {
     private boolean debugParser = false;
     private List<LdArg> ldArgs;
 
-    // private CodeGeneratorOptions genOptions = new CodeGeneratorOptions();
+     private CodeGeneratorOptions genOptions = new CodeGeneratorOptions();
     // private AssemblerOptions asOptions = new AssemblerOptions();
     // private LinkerOptions ldOptions = new LinkerOptions();
     private LibraryLoader loader = new LibraryLoader();
@@ -67,11 +67,11 @@ class Options {
         return platform.typeTable();
     }
 
-//
-//    CodeGenerator codeGenerator(ErrorHandler h) {
-//        return platform.codeGenerator(genOptions, h);
-//    }
-//
+
+    CodeGenerator codeGenerator(ErrorHandler h) {
+        return platform.codeGenerator(genOptions, h);
+    }
+
 //    Assembler assembler(ErrorHandler h) {
 //        return platform.assembler(h);
 //    }
@@ -171,25 +171,25 @@ class Options {
                 else if (arg.startsWith("-o")) {
                     outputFileName = getOptArg(arg, args);
                 }
-//                else if (arg.equals("-fpic")
-//                        || arg.equals("-fPIC")) {
-//                    genOptions.generatePIC();
-//                }
-//                else if (arg.equals("-fpie")
-//                        || arg.equals("-fPIE")) {
-//                    genOptions.generatePIE();
-//                }
-//                else if (arg.startsWith("-O")) {
-//                    String type = arg.substring(2);
-//                    if (! type.matches("^([0123s]|)$")) {
-//                        parseError("unknown optimization switch: " + arg);
-//                    }
-//                    genOptions.setOptimizationLevel(type.equals("0") ? 0 : 1);
-//                }
-//                else if (arg.equals("-fverbose-asm")
-//                        || arg.equals("--verbose-asm")) {
-//                    genOptions.generateVerboseAsm();
-//                }
+                else if (arg.equals("-fpic")
+                        || arg.equals("-fPIC")) {
+                    genOptions.generatePIC();
+                }
+                else if (arg.equals("-fpie")
+                        || arg.equals("-fPIE")) {
+                    genOptions.generatePIE();
+                }
+                else if (arg.startsWith("-O")) {
+                    String type = arg.substring(2);
+                    if (! type.matches("^([0123s]|)$")) {
+                        parseError("unknown optimization switch: " + arg);
+                    }
+                    genOptions.setOptimizationLevel(type.equals("0") ? 0 : 1);
+                }
+                else if (arg.equals("-fverbose-asm")
+                        || arg.equals("--verbose-asm")) {
+                    genOptions.generateVerboseAsm();
+                }
 //                else if (arg.startsWith("-Wa,")) {
 //                    for (String a : parseCommaSeparatedOptions(arg)) {
 //                        asOptions.addArg(a);
@@ -198,9 +198,9 @@ class Options {
 //                else if (arg.equals("-Xassembler")) {
 //                    asOptions.addArg(nextArg(arg, args));
 //                }
-                else if (arg.equals("-static")) {
-                    addLdArg(arg);
-                }
+//                else if (arg.equals("-static")) {
+//                    addLdArg(arg);
+//                }
 //                else if (arg.equals("-shared")) {
 //                    ldOptions.generatingSharedLibrary = true;
 //                }
